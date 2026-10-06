@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>nêhiyawêwin Grammar Lab</title>
+<style>
+:root{--ink:#17221c;--paper:#f6f2e8;--card:#fffdf7;--accent:#315b46;--soft:#dfe8df;--muted:#68736d;--danger:#8d3f3f}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--paper);color:var(--ink)}
+header{padding:28px 18px 18px;max-width:1050px;margin:auto}
+h1{margin:0 0 5px;font-size:clamp(2rem,5vw,3.5rem);line-height:1}
+.subtitle{color:var(--muted);max-width:760px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+button,.btn{font:inherit;border:1px solid #9ba69f;background:var(--card);color:var(--ink);padding:11px 14px;border-radius:10px;cursor:pointer}
+button:hover,.btn:hover{border-color:var(--accent)}
+button.active,.primary{background:var(--accent);color:white;border-color:var(--accent)}
+main{max-width:1050px;margin:auto;padding:10px 18px 50px}
+.panel{background:var(--card);border:1px solid #d8d8cf;border-radius:16px;padding:22px;margin-top:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.game-card{border:1px solid #d8d8cf;border-radius:14px;padding:18px;background:white}
+.game-card h3{margin-top:0}
+.bigword{font-size:clamp(2rem,7vw,4.4rem);font-weight:750;line-height:1.05;margin:18px 0 8px}
+.meaning{font-size:1.1rem;color:var(--muted);margin-bottom:18px}
+.answers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.feedback{min-height:48px;margin-top:14px;padding:12px;border-radius:10px;background:var(--soft)}
+.good{outline:2px solid #558568}
+.bad{outline:2px solid var(--danger)}
+.score{font-weight:700;margin-left:auto}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+label{font-weight:650}
+select,input{font:inherit;padding:10px;border:1px solid #9ba69f;border-radius:9px;background:white;min-width:160px}
+.breakdown{display:flex;gap:6px;flex-wrap:wrap;margin:16px 0}
+.morph{background:#e9eee9;border:1px solid #cbd6ce;border-radius:9px;padding:9px 11px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:9px;border-bottom:1px solid #ddd}
+th{position:sticky;top:0;background:var(--card)}
+.searchwrap{max-height:470px;overflow:auto;border:1px solid #ddd;border-radius:10px;margin-top:12px}
+.small{font-size:.9rem;color:var(--muted)}
+.notice{padding:12px;background:#eee9dc;border-radius:10px}
+.hidden{display:none}
+@media(max-width:520px){.answers{grid-template-columns:1fr}.panel{padding:16px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>nêhiyawêwin Grammar Lab</h1>
+  <div class="subtitle">A prototype learning resource for exploring Plains Cree vocabulary and grammatical categories through play. Built from the project vocabulary workbook.</div>
+  <nav>
+    <button class="tab active" data-page="home">Home</button>
+    <button class="tab" data-page="animacy">Animacy Challenge</button>
+    <button class="tab" data-page="verbs">Verb Detective</button>
+    <button class="tab" data-page="match">Word Match</button>
+    <button class="tab" data-page="builder">Sentence Builder</button>
+    <button class="tab" data-page="explore">Explore Words</button>
+  </nav>
+</header>
+
+<main>
+<section id="home" class="page">
+  <div class="panel">
+    <h2>Learn grammar by noticing patterns</h2>
+    <p>This first version focuses on four things the workbook can support safely: noun animacy, verb classes, vocabulary recognition, and a verified VAI person/number paradigm.</p>
+    <div class="grid">
+      <div class="game-card"><h3>Animacy Challenge</h3><p>Decide whether a noun is grammatically animate (NA) or inanimate (NI).</p></div>
+      <div class="game-card"><h3>Verb Detective</h3><p>Identify VAI, VTA, VTI, and VII forms using the grammatical labels already in the vocabulary data.</p></div>
+      <div class="game-card"><h3>Word Match</h3><p>Match a Cree form to its English meaning.</p></div>
+      <div class="game-card"><h3>Sentence Builder</h3><p>Explore verified independent-order forms of <em>mîcisow</em> “eat.”</p></div>
+    </div>
+    <p class="notice"><strong>Design rule:</strong> this prototype does not automatically invent conjugations for every verb. The workbook itself warns that Cree verb classes and stem patterns cannot be treated as one universal ending system. Later versions can add only paradigms that have been verified.</p>
+  </div>
+</section>
+
+<section id="animacy" class="page hidden">
+  <div class="panel">
+    <div class="row"><h2>Animacy Challenge</h2><div class="score" id="animacyScore">0 / 0</div></div>
+    <p>Is this Cree noun grammatically animate or inanimate?</p>
+    <div class="bigword" id="animacyWord">...</div>
+    <div class="meaning" id="animacyMeaning"></div>
+    <div class="answers">
+      <button data-answer="NA" class="animacyAnswer">Animate noun (NA)</button>
+      <button data-answer="NI" class="animacyAnswer">Inanimate noun (NI)</button>
+    </div>
+    <div id="animacyFeedback" class="feedback">Choose an answer.</div>
+    <button id="animacyNext" class="primary" style="margin-top:12px">Next word</button>
+  </div>
+</section>
+
+<section id="verbs" class="page hidden">
+  <div class="panel">
+    <div class="row"><h2>Verb Detective</h2><div class="score" id="verbScore">0 / 0</div></div>
+    <p>Choose the grammatical class recorded for this verb.</p>
+    <div class="bigword" id="verbWord">...</div>
+    <div class="meaning" id="verbMeaning"></div>
+    <div class="answers" id="verbAnswers"></div>
+    <div id="verbFeedback" class="feedback">Choose an answer.</div>
+    <button id="verbNext" class="primary" style="margin-top:12px">Next verb</button>
+  </div>
+</section>
+
+<section id="match" class="page hidden">
+  <div class="panel">
+    <div class="row"><h2>Word Match</h2><div class="score" id="matchScore">0 / 0</div></div>
+    <p>Choose the English meaning.</p>
+    <div class="bigword" id="matchWord">...</div>
+    <div class="answers" id="matchAnswers"></div>
+    <div id="matchFeedback" class="feedback">Choose an answer.</div>
+    <button id="matchNext" class="primary" style="margin-top:12px">Next word</button>
+  </div>
+</section>
+
+<section id="builder" class="page hidden">
+  <div class="panel">
+    <h2>Sentence Builder: <em>mîcisow</em> “eat”</h2>
+    <p>This module begins with one verified VAI paradigm so the app teaches a real pattern without pretending every VAI stem behaves identically.</p>
+    <div class="row">
+      <label for="personSelect">Person / number</label>
+      <select id="personSelect"></select>
+    </div>
+    <div class="bigword" id="builtForm"></div>
+    <div class="meaning" id="builtMeaning"></div>
+    <div class="breakdown" id="morphBreakdown"></div>
+    <div id="builderNote" class="feedback"></div>
+  </div>
+</section>
+
+<section id="explore" class="page hidden">
+  <div class="panel">
+    <h2>Explore the vocabulary</h2>
+    <p class="small"><span id="wordCount"></span> unique Cree forms loaded from the workbook.</p>
+    <input id="searchBox" type="search" placeholder="Search Cree, English, grammar or category" style="width:100%">
+    <div class="searchwrap">
+      <table>
+        <thead><tr><th>Cree</th><th>English</th><th>Grammar</th><th>Category</th></tr></thead>
+        <tbody id="wordTable"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+</main>
+
+<script src="data.js"></script>
+<script>
+const data = window.CREE_DATA || [];
+const gkey = window.GRAMMAR_KEY || {};
+const pages = document.querySelectorAll('.page');
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  pages.forEach(p=>p.classList.toggle('hidden',p.id!==b.dataset.page));
+}));
+
+function pick(a){ return a[Math.floor(Math.random()*a.length)] }
+function shuffle(a){ return [...a].sort(()=>Math.random()-.5) }
+function setScore(id,s){ document.getElementById(id).textContent=s.good+" / "+s.total }
+
+const nouns=data.filter(x=>x.grammar==="NA"||x.grammar==="NI");
+let animacyCurrent, animacy={good:0,total:0,locked:false};
+function nextAnimacy(){
+  animacyCurrent=pick(nouns); animacy.locked=false;
+  document.getElementById('animacyWord').textContent=animacyCurrent.cree;
+  document.getElementById('animacyMeaning').textContent=animacyCurrent.english;
+  document.getElementById('animacyFeedback').textContent='Choose an answer.';
+  document.querySelectorAll('.animacyAnswer').forEach(b=>b.classList.remove('good','bad'));
+}
+document.querySelectorAll('.animacyAnswer').forEach(b=>b.addEventListener('click',()=>{
+  if(animacy.locked)return; animacy.locked=true; animacy.total++;
+  const ok=b.dataset.answer===animacyCurrent.grammar; if(ok)animacy.good++;
+  b.classList.add(ok?'good':'bad'); setScore('animacyScore',animacy);
+  const label=gkey[animacyCurrent.grammar]||animacyCurrent.grammar;
+  document.getElementById('animacyFeedback').textContent =
+    (ok?'Correct. ':'Not this time. ') + animacyCurrent.cree+' is recorded as '+animacyCurrent.grammar+' ('+label+').';
+}));
+document.getElementById('animacyNext').addEventListener('click',nextAnimacy);
+
+const verbClasses=['VAI','VTA','VII','VTI-1','VTI-2','VTI-3'];
+const verbs=data.filter(x=>verbClasses.includes(x.grammar));
+let verbCurrent, verbScore={good:0,total:0,locked:false};
+function nextVerb(){
+  verbCurrent=pick(verbs); verbScore.locked=false;
+  document.getElementById('verbWord').textContent=verbCurrent.cree;
+  document.getElementById('verbMeaning').textContent=verbCurrent.english;
+  document.getElementById('verbFeedback').textContent='Choose an answer.';
+  const correct=verbCurrent.grammar;
+  let opts=[correct];
+  while(opts.length<4){const c=pick(verbClasses);if(!opts.includes(c))opts.push(c)}
+  const box=document.getElementById('verbAnswers'); box.innerHTML='';
+  shuffle(opts).forEach(o=>{
+    const b=document.createElement('button'); b.textContent=o; b.dataset.answer=o;
+    b.addEventListener('click',()=>{
+      if(verbScore.locked)return; verbScore.locked=true; verbScore.total++;
+      const ok=o===correct; if(ok)verbScore.good++; b.classList.add(ok?'good':'bad'); setScore('verbScore',verbScore);
+      document.getElementById('verbFeedback').textContent=(ok?'Correct. ':'The recorded class is '+correct+'. ')+(gkey[correct]||'');
+    }); box.appendChild(b);
+  });
+}
+document.getElementById('verbNext').addEventListener('click',nextVerb);
+
+let matchCurrent, matchScore={good:0,total:0,locked:false};
+const matchPool=data.filter(x=>x.cree&&x.english);
+function nextMatch(){
+  matchCurrent=pick(matchPool); matchScore.locked=false;
+  document.getElementById('matchWord').textContent=matchCurrent.cree;
+  document.getElementById('matchFeedback').textContent='Choose an answer.';
+  let opts=[matchCurrent.english];
+  while(opts.length<4){let x=pick(matchPool).english;if(x&&!opts.includes(x))opts.push(x)}
+  const box=document.getElementById('matchAnswers'); box.innerHTML='';
+  shuffle(opts).forEach(o=>{
+    const b=document.createElement('button'); b.textContent=o;
+    b.addEventListener('click',()=>{
+      if(matchScore.locked)return; matchScore.locked=true; matchScore.total++;
+      const ok=o===matchCurrent.english; if(ok)matchScore.good++; b.classList.add(ok?'good':'bad'); setScore('matchScore',matchScore);
+      document.getElementById('matchFeedback').textContent=ok?'Correct.':('Answer: '+matchCurrent.english);
+    }); box.appendChild(b);
+  });
+}
+document.getElementById('matchNext').addEventListener('click',nextMatch);
+
+const ps=document.getElementById('personSelect');
+(window.VAI_FORMS||[]).forEach((x,i)=>{const o=document.createElement('option');o.value=i;o.textContent=x.person+' — '+x.meaning;ps.appendChild(o)});
+function renderBuilder(){
+  const x=window.VAI_FORMS[Number(ps.value)||0];
+  document.getElementById('builtForm').textContent=x.form;
+  document.getElementById('builtMeaning').textContent=x.english.replace('___','eat');
+  const pieces=[];
+  if(x.prefix && x.prefix!=='—')pieces.push(['prefix',x.prefix]);
+  pieces.push(['stem','mîciso-']);
+  if(x.ending)pieces.push(['ending',x.ending]);
+  document.getElementById('morphBreakdown').innerHTML=pieces.map(p=>'<span class="morph"><strong>'+p[0]+':</strong> '+p[1]+'</span>').join('');
+  document.getElementById('builderNote').textContent='Independent-order example from the VAI paradigm guide in the workbook. This is a teaching model, not a universal rule for every Cree verb stem.';
+}
+ps.addEventListener('change',renderBuilder);
+
+document.getElementById('wordCount').textContent=data.length;
+const tb=document.getElementById('wordTable');
+function renderTable(q=''){
+  q=q.trim().toLowerCase();
+  const rows=data.filter(x=>!q||[x.cree,x.english,x.grammar,x.category].join(' ').toLowerCase().includes(q)).slice(0,250);
+  tb.innerHTML=rows.map(x=>'<tr><td>'+esc(x.cree)+'</td><td>'+esc(x.english)+'</td><td>'+esc(x.grammar)+'</td><td>'+esc(x.category)+'</td></tr>').join('');
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+document.getElementById('searchBox').addEventListener('input',e=>renderTable(e.target.value));
+
+nextAnimacy(); nextVerb(); nextMatch(); renderBuilder(); renderTable();
+</script>
+</body>
+</html>
